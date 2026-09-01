@@ -34,54 +34,17 @@ form.addEventListener("submit", async (e) => {
   form.reset();
   editingId = null;
   form.querySelector("button[type=submit]").textContent = "إضافة";
-  loadProducts();
 });
 
-// جلب وعرض كل المنتجات
-async function loadProducts() {
-  const res = await fetch("/api/products");
-  const products = await res.json();
+// لو الرابط فيه ?edit=ID، عبّي الفورم تلقائياً بذاك المنتج
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get("edit");
 
-  const listDiv = document.getElementById("productsList");
-  listDiv.innerHTML = "";
-
-  products.forEach(p => {
-    const item = document.createElement("div");
-    item.className = "product-item";
-    item.innerHTML = `
-      <strong>${p.name}</strong> - ${p.price} $ (الكمية: ${p.stock})
-      <button onclick="deleteProduct('${p._id}')">🗑️ حذف</button>
-      <button onclick="editProduct('${p._id}')">✏️ تعديل</button>
-    `;
-    listDiv.appendChild(item);
-  });
+if (editId) {
+  loadProductForEdit(editId);
 }
 
-// حذف منتج
-async function deleteProduct(id) {
-  const confirmed = confirm("متأكد إنك بدك تحذف هالمنتج؟");
-  if (!confirmed) return;
-
-  const res = await fetch("/api/products/" + id, {
-    method: "DELETE",
-    headers: {
-      "Authorization": "Bearer " + token
-    }
-  });
-
-  if (res.status === 401) {
-    alert("❌ الجلسة منتهية، سجّل دخول من جديد");
-    localStorage.removeItem("adminToken");
-    window.location.href = "login.html";
-    return;
-  }
-
-  alert("✅ تم حذف المنتج");
-  loadProducts();
-}
-
-// تعديل منتج
-async function editProduct(id) {
+async function loadProductForEdit(id) {
   const res = await fetch("/api/products");
   const products = await res.json();
   const product = products.find(p => p._id === id);
@@ -97,6 +60,3 @@ async function editProduct(id) {
   editingId = id;
   form.querySelector("button[type=submit]").textContent = "💾 حفظ التعديل";
 }
-
-// تحميل المنتجات فور فتح الصفحة
-loadProducts();
