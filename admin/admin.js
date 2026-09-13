@@ -30,6 +30,13 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  if (!res.ok) {
+    const error = await res.json();
+    const messages = error.errors ? error.errors.join("\n") : error.message;
+    alert(messages || "❌ حدث خطأ");
+    return;
+  }
+
   alert(editingId ? "✅ تم تعديل المنتج!" : "✅ تمت إضافة المنتج!");
   form.reset();
   editingId = null;

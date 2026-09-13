@@ -2,6 +2,7 @@ const expressRouter = require("express");
 const router = expressRouter.Router();
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const verifyToken = require("../middleware/verifyToken");
 
 // إنشاء طلب جديد
 router.post("/", async (req, res) => {
@@ -57,7 +58,7 @@ router.post("/", async (req, res) => {
 });
 
 // جلب كل الطلبات
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   const orders = await Order.find().sort({ createdAt: -1 });
   res.json(orders);
 });

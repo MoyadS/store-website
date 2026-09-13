@@ -33,10 +33,16 @@ async function deleteProduct(id) {
     }
   });
 
-  if (res.status === 401) {
+ if (res.status === 401) {
     alert("❌ الجلسة منتهية، سجّل دخول من جديد");
     localStorage.removeItem("adminToken");
     window.location.href = "login.html";
+    return;
+  }
+
+  if (!res.ok) {
+    const error = await res.json();
+    alert(error.message || "❌ حدث خطأ بالحذف");
     return;
   }
 
